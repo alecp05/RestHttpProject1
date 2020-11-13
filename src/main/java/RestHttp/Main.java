@@ -4,17 +4,14 @@ import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 public class Main {
-
-    private static ServerSocket serverSocket = null;
 
     public static void main(String[] args) throws IOException{
 
 
+        ServerSocket serverSocket;
         try {
             //ready to listen incoming connection on port 8080
             serverSocket = new ServerSocket(8080);
@@ -41,11 +38,11 @@ public class Main {
 
         //read the content of the InputStream with BufferedReader
         BufferedReader breader = new BufferedReader(new InputStreamReader(client.getInputStream()));
-        InputStream iS = client.getInputStream();
+        //InputStream iS = client.getInputStream();
 
         StringBuilder build = new StringBuilder();
         String lines;
-        String[] lines2;
+        //String[] lines2;
         StringBuilder content = new StringBuilder();
 
         while (!(lines = breader.readLine()).isBlank()) {
@@ -54,7 +51,8 @@ public class Main {
         String request = build.toString();
         System.out.println("---2\n" + request);
 
-        //splitting the content into terms
+        RequestContext requestClient = new RequestContext(request);
+        /*//splitting the content into terms
         String[] allTerms = request.split("\r\n");
         String[] oneTerm = allTerms[0].split(" ");
         String method = oneTerm[0];
@@ -62,32 +60,31 @@ public class Main {
         String version = oneTerm[2];
         String host = allTerms[1].split(" ")[1];
         String contleng = allTerms[4].split(" ")[1];
-        int contentLength = Integer.parseInt(contleng);
 
         List<String> headers = new ArrayList<>();
         for (int i = 2; i < allTerms.length; i++) {
             String header = allTerms[i];
             headers.add(header + "\r\n");
-        }
+        }*/
+        String usedMethod = requestClient.getMethod();
 
-        if(method.equals("POST")){
-
-            System.out.println(contentLength);
+        if(usedMethod.equals("POST")){
+            int counter = Integer.parseInt(requestClient.getContentLength());
+            System.out.println(counter);
 
             int value;
-            for(int j = 0; j <contentLength ;j++) {
+            for(int j = 0; j <counter ;j++) {
                 value = breader.read();
                 content.append((char) value);
             }
             System.out.println(content.toString());
 
 
-
         }
 
-        String accessLog = String.format("Client %s, method %s, path %s, version %s, host %s, headers %s",
+        /*String accessLog = String.format("Client %s, method %s, path %s, version %s, host %s, headers %s",
                 client.toString(), method, path, version, host, headers);
-        System.out.println(accessLog);
+        System.out.println(accessLog);*/
 
         Date today = new Date();
         String httpResponse = "HTTP/1.1 200 OK\r\n"
