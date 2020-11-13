@@ -52,6 +52,7 @@ public class Main {
         RequestContext requestClient = new RequestContext(request);
         requestClient.printContexts();
 
+        //--------------------------------
         //which Request is being received
         String usedMethod = requestClient.getMethod();
         if(usedMethod.equals("POST")){
@@ -71,15 +72,15 @@ public class Main {
             post.saveMessagePOST(requestClient.getPayload(),requestClient.getPath());
             client.getOutputStream().write(post.responsePOST().getBytes(StandardCharsets.UTF_8));
 
-        }
+        }else if (usedMethod.equals("GET")) {
+            EndpointHandler getAll = new EndpointHandler();
+            String allmsg;
+            allmsg = getAll.printAllGET(requestClient.getPath());
 
-        Date today = new Date();
-        String httpResponse = "HTTP/1.1 200 OK\r\n"
-                +"Server: Alec\r\n"
-                + "Content-Type: text/html\r\n"
-                + "Accept-Ranges: bytes \r\n"
-                + "Content-Lenght: 0 \r\n\r\n" + today;
-        client.getOutputStream().write(httpResponse.getBytes(StandardCharsets.UTF_8));
+            //all msg printed
+            String httpResponse = getAll.responseGET() + allmsg;
+            client.getOutputStream().write(httpResponse.getBytes(StandardCharsets.UTF_8));
+        }
         client.close();
     }
 
