@@ -38,11 +38,9 @@ public class Main {
 
         //read the content of the InputStream with BufferedReader
         BufferedReader breader = new BufferedReader(new InputStreamReader(client.getInputStream()));
-        //InputStream iS = client.getInputStream();
 
         StringBuilder build = new StringBuilder();
         String lines;
-        //String[] lines2;
         StringBuilder content = new StringBuilder();
 
         while (!(lines = breader.readLine()).isBlank()) {
@@ -52,46 +50,35 @@ public class Main {
         System.out.println("---2\n" + request);
 
         RequestContext requestClient = new RequestContext(request);
-        /*//splitting the content into terms
-        String[] allTerms = request.split("\r\n");
-        String[] oneTerm = allTerms[0].split(" ");
-        String method = oneTerm[0];
-        String path = oneTerm[1];
-        String version = oneTerm[2];
-        String host = allTerms[1].split(" ")[1];
-        String contleng = allTerms[4].split(" ")[1];
+        requestClient.printContexts();
 
-        List<String> headers = new ArrayList<>();
-        for (int i = 2; i < allTerms.length; i++) {
-            String header = allTerms[i];
-            headers.add(header + "\r\n");
-        }*/
+        //which Request is being received
         String usedMethod = requestClient.getMethod();
-
         if(usedMethod.equals("POST")){
-            int counter = Integer.parseInt(requestClient.getContentLength());
-            System.out.println(counter);
 
+            int counter = Integer.parseInt(requestClient.getContentLength());
             int value;
+            //saving payload by characters
             for(int j = 0; j <counter ;j++) {
                 value = breader.read();
                 content.append((char) value);
             }
-            System.out.println(content.toString());
-
+            //payload being set
+            requestClient.setPayload(content.toString());
+            System.out.println(requestClient.getPayload());
+            //payload sent to handlerPOST
+            EndpointHandler post = new EndpointHandler();
+            post.saveMessagePOST(requestClient.getPayload(),requestClient.getPath());
+            client.getOutputStream().write(post.responsePOST().getBytes(StandardCharsets.UTF_8));
 
         }
-
-        /*String accessLog = String.format("Client %s, method %s, path %s, version %s, host %s, headers %s",
-                client.toString(), method, path, version, host, headers);
-        System.out.println(accessLog);*/
 
         Date today = new Date();
         String httpResponse = "HTTP/1.1 200 OK\r\n"
                 +"Server: Alec\r\n"
                 + "Content-Type: text/html\r\n"
                 + "Accept-Ranges: bytes \r\n"
-                + "Conent-Lenght: 0 \r\n\r\n" + today;
+                + "Content-Lenght: 0 \r\n\r\n" + today;
         client.getOutputStream().write(httpResponse.getBytes(StandardCharsets.UTF_8));
         client.close();
     }
