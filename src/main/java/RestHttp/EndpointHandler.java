@@ -42,8 +42,7 @@ public class EndpointHandler {
     }
     public String responsePOST(){
         String response = "POST Request SUCCESS\nYour message is saved in Textfile ID: " + messageID;
-        String httpResponse = "HTTP/1.1 200 OK\r\n"
-                +"Server: Alec\r\n"
+        String httpResponse = "HTTP/1.1 201 Created\r\n"
                 + "Content-Type: text/html\r\n"
                 + "Accept-Ranges: bytes \r\n"
                 + "Content-Lenght: 0 \r\n\r\n" + response;
@@ -52,25 +51,17 @@ public class EndpointHandler {
 
     public String printAllGET(String path) throws FileNotFoundException {
 
-        String pathName = "src/main" + path;
         StringBuilder allMsg = new StringBuilder();
 
-        //searching through all files in specified directory
-        File dir = new File(pathName);
-        String[] children = dir.list();
+        if(path.length()>9){
+            String[] splitting = path.split("/");
+            String messageID;
+            if(splitting.length>2){
+                messageID = splitting[2];
+                allMsg.append("MessageID: "+ messageID + " \r\n");
+                String pathName = "src/main" + path + ".txt" ;
 
-        if (children == null) {
-            System.out.println("does not exist or is not a directory");
-        } else {
-            int messageID = 1;
-            for (int i = 0; i < children.length; i++) {
-
-                String filename = children[i];
-                allMsg.append(filename + "\r\n\n");
-
-                //read every textfile
-                filename = "src/main/messages/" + filename;
-                File myObj = new File(filename);
+                File myObj = new File(pathName);
                 Scanner myReader = new Scanner(myObj);
 
                 while (myReader.hasNextLine()) {
@@ -78,7 +69,35 @@ public class EndpointHandler {
                     allMsg.append(data+ "\r\n\n");
                 }
                 myReader.close();
+            }
 
+        }else{
+            String pathName = "src/main" + path;
+            //searching through all files in specified directory
+            File dir = new File(pathName);
+            String[] children = dir.list();
+
+            if (children == null) {
+                System.out.println("does not exist or is not a directory");
+            } else {
+
+                for (int i = 0; i < children.length; i++) {
+
+                    String filename = children[i];
+                    allMsg.append(filename + "\r\n\n");
+
+                    //read every textfile
+                    filename = "src/main/messages/" + filename;
+                    File myObj = new File(filename);
+                    Scanner myReader = new Scanner(myObj);
+
+                    while (myReader.hasNextLine()) {
+                        String data = myReader.nextLine();
+                        allMsg.append(data+ "\r\n\n");
+                    }
+                    myReader.close();
+
+                    }
             }
         }
         return allMsg.toString();
@@ -87,7 +106,6 @@ public class EndpointHandler {
 
     public String responseGET(){
         String httpResponse = "HTTP/1.1 200 OK\r\n"
-                +"Server: Alec\r\n"
                 + "Content-Type: text/html\r\n"
                 + "Accept-Ranges: bytes \r\n"
                 + "Content-Lenght: 0 \r\n\r\n";
