@@ -98,10 +98,32 @@ public class Main {
         }else if(usedMethod.equals("DELETE")){
             EndpointHandler delete = new EndpointHandler();
             if(delete.deleteDEL(requestClient.getPath())){
-                String httpResponse = delete.responseDELETE() ;
+                String httpResponse = delete.responseDELETE();
                 client.getOutputStream().write(httpResponse.getBytes(StandardCharsets.UTF_8));
             }else{
                 String httpResponse = delete.responseErrorDELETE();
+                client.getOutputStream().write(httpResponse.getBytes(StandardCharsets.UTF_8));
+            }
+        }else if(usedMethod.equals("PUT")){
+            EndpointHandler put = new EndpointHandler();
+
+            int counter = Integer.parseInt(requestClient.getContentLength());
+            int value;
+            //saving payload by characters
+            for (int j = 0; j < counter; j++) {
+                value = breader.read();
+                content.append((char) value);
+            }
+            //payload being set
+            requestClient.setPayload(content.toString());
+            System.out.println("Message:");
+            System.out.println(requestClient.getPayload());
+
+            if(put.contentPUT(requestClient.getPath(),requestClient.getPayload())){
+                String httpResponse = put.responsePUT();
+                client.getOutputStream().write(httpResponse.getBytes(StandardCharsets.UTF_8));
+            }else{
+                String httpResponse = put.responseErrorPUT();
                 client.getOutputStream().write(httpResponse.getBytes(StandardCharsets.UTF_8));
             }
         }

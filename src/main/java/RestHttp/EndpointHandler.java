@@ -193,6 +193,39 @@ public class EndpointHandler {
         return httpResponse;
     }
 
+    public boolean contentPUT(String path, String message){
+        String pathName = "src/main/" + path +".txt";
+        File myObj = new File(pathName);
+        boolean exists = myObj.exists();
+        if(exists){
+            myObj.delete();
+            try(BufferedWriter writer = new BufferedWriter(new FileWriter(pathName))) {
+                writer.write(message);
+            }
+            catch(IOException e){
+                e.printStackTrace();
+            }
+            System.out.println("--> Message has been updated");
+            return true;
+        }else{
+            System.out.println("File could not be replaced");
+        } return false;
+
+    }
+    public String responsePUT(){
+        String httpResponse = "HTTP/1.1 202 Accepted\r\n"
+                + "Content-Type: text/html\r\n"
+                + "Accept-Ranges: bytes \r\n"
+                + "Content-Lenght: 0 \r\n\r\n" + "The Message has been replaced...";
+        return httpResponse;
+    }
+    public String responseErrorPUT(){
+        String httpResponse = "HTTP/1.1 404 Not Found\r\n"
+                + "Content-Type: text/html\r\n"
+                + "Accept-Ranges: bytes \r\n"
+                + "Content-Lenght: 0 \r\n\r\n" + "File not found or doesn't exists...";
+        return httpResponse;
+    }
     public void setMessageID(int messageID) {
         this.messageID = messageID;
     }
