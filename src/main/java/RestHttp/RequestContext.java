@@ -13,7 +13,7 @@ public class RequestContext {
     private String payload;
 
     public RequestContext(String context){
-        //splitting the content into terms
+        //splitting the Content into terms
         String[] allTerms = context.split("\r\n");
         String[] oneTerm = allTerms[0].split(" ");
         String method = oneTerm[0];

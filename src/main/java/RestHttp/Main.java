@@ -4,7 +4,6 @@ import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
-import java.util.Date;
 
 public class Main {
 
@@ -20,14 +19,11 @@ public class Main {
             e.printStackTrace();
             return;
         }
-
         try {
             while (true) {
                 //accepting incoming connection
                 Socket socket = serverSocket.accept();
-                    System.out.println("---1");
                     handleRequest(socket);
-
             }
         }catch (Exception e) {
             e.printStackTrace();
@@ -43,11 +39,12 @@ public class Main {
         String lines;
         StringBuilder content = new StringBuilder();
 
+        //only HTTP Form Terms
         while (!(lines = breader.readLine()).isBlank()) {
             build.append(lines + "\r\n");
         }
         String request = build.toString();
-        System.out.println("---2\n" + request);
+        System.out.println(request);
 
         RequestContext requestClient = new RequestContext(request);
         requestClient.printContexts();
@@ -55,8 +52,11 @@ public class Main {
         //--------------------------------
         //which Request is being received
         String usedMethod = requestClient.getMethod();
+
         if(usedMethod.equals("POST")){
-            if(requestClient.getPath().length()>9){
+            //check if correct Directory
+            if(!requestClient.getPath().equals("/messages") && !requestClient.getPath().equals("/messages/")){
+                System.out.println("POST Request failed\n");
                 EndpointHandler post = new EndpointHandler();
                 client.getOutputStream().write(post.responseErrorPOST().getBytes(StandardCharsets.UTF_8));
             }else {
@@ -80,16 +80,17 @@ public class Main {
         }else if (usedMethod.equals("GET")) {
             EndpointHandler getAll = new EndpointHandler();
             String allmsg;
+            //check correct Directory
             if(requestClient.getPath().length()<9){
                 EndpointHandler get = new EndpointHandler();
                 client.getOutputStream().write(get.responseErrorGET().getBytes(StandardCharsets.UTF_8));
             }else {
                 allmsg = getAll.printAllGET(requestClient.getPath());
+                //check if File found
                 if(allmsg.equals("NOTFOUND")){
                     String httpResponse = getAll.responseErrorGET2();
                     client.getOutputStream().write(httpResponse.getBytes(StandardCharsets.UTF_8));
                 }else {
-
                     //all msg printed
                     String httpResponse = getAll.responseGET() + allmsg;
                     client.getOutputStream().write(httpResponse.getBytes(StandardCharsets.UTF_8));
@@ -97,6 +98,7 @@ public class Main {
             }
         }else if(usedMethod.equals("DELETE")){
             EndpointHandler delete = new EndpointHandler();
+            //check if deleteFunction was successful
             if(delete.deleteDEL(requestClient.getPath())){
                 String httpResponse = delete.responseDELETE();
                 client.getOutputStream().write(httpResponse.getBytes(StandardCharsets.UTF_8));
@@ -119,6 +121,7 @@ public class Main {
             System.out.println("Message:");
             System.out.println(requestClient.getPayload());
 
+            //check if putFunction was successful
             if(put.contentPUT(requestClient.getPath(),requestClient.getPayload())){
                 String httpResponse = put.responsePUT();
                 client.getOutputStream().write(httpResponse.getBytes(StandardCharsets.UTF_8));

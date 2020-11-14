@@ -41,7 +41,7 @@ public class EndpointHandler {
             }
             pathFile = "src/main"+ path + "/" + Integer.toString(messageID_temp) +".txt";
             //System.out.println(list);
-            System.out.println("\nThis is the given MessageID: " + messageID_temp);
+            System.out.println("\nThis is the given MessageID: " + messageID_temp + "\n");
 
         }
         //write the message in the File
@@ -59,7 +59,9 @@ public class EndpointHandler {
         String httpResponse = "HTTP/1.1 201 Created\r\n"
                 + "Content-Type: text/html\r\n"
                 + "Accept-Ranges: bytes \r\n"
-                + "Content-Lenght: 0 \r\n\r\n" + response;
+                + "Server: Alec \r\n"
+                + "Status: 201 \r\n"
+                + "Content-Lenght: 61 \r\n\r\n" + response;
         return httpResponse;
     }
     public String responseErrorPOST(){
@@ -67,7 +69,9 @@ public class EndpointHandler {
         String httpResponse = "HTTP/1.1 404 not Found\r\n"
                 + "Content-Type: text/html\r\n"
                 + "Accept-Ranges: bytes \r\n"
-                + "Content-Lenght: 0 \r\n\r\n" + "Wrong Directory!";
+                + "Server: Alec \r\n"
+                + "Status: 404 \r\n"
+                + "Content-Lenght: 16 \r\n\r\n" + "Wrong Directory!";
         return httpResponse;
     }
 
@@ -100,9 +104,9 @@ public class EndpointHandler {
                         allMsg.append(data + "\r\n\n");
                     }
                     myReader.close();
-                    System.out.println("The message with the ID: " + messageID + " is sent to the Client");
+                    System.out.println("The message with the ID: " + messageID + " is sent to the Client\n");
                 }else {
-                    System.out.println("File doesn't exist!");
+                    System.out.println("File doesn't exist!\n");
                     allMsg.append("NOTFOUND");
                 }
             }
@@ -137,7 +141,7 @@ public class EndpointHandler {
                     myReader.close();
 
                 }
-                System.out.println("All messages is sent to the Client");
+                System.out.println("All messages is sent to the Client\n");
             }
         }
         return allMsg.toString();
@@ -148,6 +152,8 @@ public class EndpointHandler {
         String httpResponse = "HTTP/1.1 200 OK\r\n"
                 + "Content-Type: text/html\r\n"
                 + "Accept-Ranges: bytes \r\n"
+                + "Server: Alec \r\n"
+                + "Status: 200 \r\n"
                 + "Content-Lenght: 0 \r\n\r\n";
         return httpResponse;
     }
@@ -155,14 +161,18 @@ public class EndpointHandler {
         String httpResponse = "HTTP/1.1 404 Not Found\r\n"
                 + "Content-Type: text/html\r\n"
                 + "Accept-Ranges: bytes \r\n"
-                + "Content-Lenght: 0 \r\n\r\n" + "Wrong Directory! No Content found...";
+                + "Server: Alec \r\n"
+                + "Status: 404 \r\n"
+                + "Content-Lenght: 36 \r\n\r\n" + "Wrong Directory! No Content found...";
         return httpResponse;
     }
     public String responseErrorGET2(){
         String httpResponse = "HTTP/1.1 404 Not Found\r\n"
                 + "Content-Type: text/html\r\n"
                 + "Accept-Ranges: bytes \r\n"
-                + "Content-Lenght: 0 \r\n\r\n" + "File not found or doesn't exists...";
+                + "Server: Alec \r\n"
+                + "Status: 404 \r\n"
+                + "Content-Lenght: 35 \r\n\r\n" + "File not found or doesn't exists...";
         return httpResponse;
     }
 
@@ -170,26 +180,31 @@ public class EndpointHandler {
         String pathName = "src/main/" + path +".txt";
         File myObj = new File(pathName);
         boolean exists = myObj.exists();
+        //check if file exists
         if(exists){
             myObj.delete();
-                System.out.println("File: " + myObj.getName() + " has been deleted");
+                System.out.println("File: " + myObj.getName() + " has been deleted\n");
                 return true;
         }else{
-            System.out.println("File could not be deleted");
+            System.out.println("File could not be deleted\n");
         } return false;
     }
     public String responseDELETE(){
         String httpResponse = "HTTP/1.1 202 Accepted\r\n"
                 + "Content-Type: text/html\r\n"
                 + "Accept-Ranges: bytes \r\n"
-                + "Content-Lenght: 0 \r\n\r\n" + "The Message has been deleted...";
+                + "Server: Alec \r\n"
+                + "Status: 202 \r\n"
+                + "Content-Lenght: 31 \r\n\r\n" + "The Message has been deleted...";
         return httpResponse;
     }
     public String responseErrorDELETE(){
         String httpResponse = "HTTP/1.1 404 Not Found\r\n"
                 + "Content-Type: text/html\r\n"
                 + "Accept-Ranges: bytes \r\n"
-                + "Content-Lenght: 0 \r\n\r\n" + "File not found or doesn't exists...";
+                + "Server: Alec \r\n"
+                + "Status: 404 \r\n"
+                + "Content-Lenght: 35 \r\n\r\n" + "File not found or doesn't exists...";
         return httpResponse;
     }
 
@@ -197,6 +212,7 @@ public class EndpointHandler {
         String pathName = "src/main/" + path +".txt";
         File myObj = new File(pathName);
         boolean exists = myObj.exists();
+
         if(exists){
             myObj.delete();
             try(BufferedWriter writer = new BufferedWriter(new FileWriter(pathName))) {
@@ -205,10 +221,10 @@ public class EndpointHandler {
             catch(IOException e){
                 e.printStackTrace();
             }
-            System.out.println("--> Message has been updated");
+            System.out.println("--> Message has been updated\n");
             return true;
         }else{
-            System.out.println("File could not be replaced");
+            System.out.println("File could not be replaced\n");
         } return false;
 
     }
@@ -216,14 +232,18 @@ public class EndpointHandler {
         String httpResponse = "HTTP/1.1 202 Accepted\r\n"
                 + "Content-Type: text/html\r\n"
                 + "Accept-Ranges: bytes \r\n"
-                + "Content-Lenght: 0 \r\n\r\n" + "The Message has been replaced...";
+                + "Server: Alec \r\n"
+                + "Status: 202 \r\n"
+                + "Content-Lenght: 32 \r\n\r\n" + "The Message has been replaced...";
         return httpResponse;
     }
     public String responseErrorPUT(){
         String httpResponse = "HTTP/1.1 404 Not Found\r\n"
                 + "Content-Type: text/html\r\n"
                 + "Accept-Ranges: bytes \r\n"
-                + "Content-Lenght: 0 \r\n\r\n" + "File not found or doesn't exists...";
+                + "Server: Alec \r\n"
+                + "Status: 404 \r\n"
+                + "Content-Lenght: 35 \r\n\r\n" + "File not found or doesn't exists...";
         return httpResponse;
     }
     public void setMessageID(int messageID) {
