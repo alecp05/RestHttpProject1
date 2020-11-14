@@ -1,8 +1,7 @@
 package RestHttp;
 
 import java.io.*;
-import java.util.Date;
-import java.util.Scanner;
+import java.util.*;
 
 public class EndpointHandler {
 
@@ -12,6 +11,9 @@ public class EndpointHandler {
 
         int messageID_temp = 1;
         String pathFile = "src/main"+ path + "/" + Integer.toString(messageID_temp) +".txt";
+        List<Integer> list = new ArrayList<Integer>();
+        int numbers;
+
         //searching through all files in specified directory
         File dir = new File("src/main/messages");
         String[] allFiles = dir.list();
@@ -23,12 +25,29 @@ public class EndpointHandler {
             //search for free messageID
             for (int i = 0; i < allFiles.length; i++) {
                 String filename = allFiles[i];
-                filename = "src/main/messages/" + filename;
-                if(filename.equals(pathFile)) {
-                    messageID_temp++;
-                }
-                pathFile = "src/main"+ path + "/" + Integer.toString(messageID_temp) +".txt";
+                //filename = "src/main/messages/" + filename;
+
+                String[] splits = filename.split("\\.");
+                numbers = Integer.parseInt(splits[0]);
+                list.add(numbers);
+                //System.out.println(numbers);
+
+                //System.out.println(allFiles[i]);
+                //if(filename.equals(pathFile)) {
+                    //messageID_temp++;
+                //}
+                //pathFile = "src/main"+ path + "/" + Integer.toString(messageID_temp) +".txt";
+                //System.out.println(pathFile + "+++");
             }
+                Collections.sort(list);
+            for(int j = 0; j<list.size();j++)
+            {
+                if(list.get(j) == (j+1))
+                    messageID_temp++;
+            }
+            pathFile = "src/main"+ path + "/" + Integer.toString(messageID_temp) +".txt";
+            System.out.println(list);
+
         }
 
         try(BufferedWriter writer = new BufferedWriter(new FileWriter(pathFile))) {
@@ -46,6 +65,14 @@ public class EndpointHandler {
                 + "Content-Type: text/html\r\n"
                 + "Accept-Ranges: bytes \r\n"
                 + "Content-Lenght: 0 \r\n\r\n" + response;
+        return httpResponse;
+    }
+    public String responseErrorPOST(){
+
+        String httpResponse = "HTTP/1.1 404 not Found\r\n"
+                + "Content-Type: text/html\r\n"
+                + "Accept-Ranges: bytes \r\n"
+                + "Content-Lenght: 0 \r\n\r\n" + "Wrong Directory!";
         return httpResponse;
     }
 
