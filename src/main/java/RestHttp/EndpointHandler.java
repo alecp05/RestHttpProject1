@@ -11,6 +11,7 @@ public class EndpointHandler {
 
         int messageID_temp = 1;
         String pathFile = "src/main"+ path + "/" + Integer.toString(messageID_temp) +".txt";
+        //creating a list for the ID in Directory
         List<Integer> list = new ArrayList<Integer>();
         int numbers;
 
@@ -22,34 +23,28 @@ public class EndpointHandler {
             System.out.println("does not exist or is not a directory");
         } else {
 
-            //search for free messageID
+            //add all ID in the List
             for (int i = 0; i < allFiles.length; i++) {
                 String filename = allFiles[i];
-                //filename = "src/main/messages/" + filename;
 
                 String[] splits = filename.split("\\.");
                 numbers = Integer.parseInt(splits[0]);
                 list.add(numbers);
-                //System.out.println(numbers);
 
-                //System.out.println(allFiles[i]);
-                //if(filename.equals(pathFile)) {
-                    //messageID_temp++;
-                //}
-                //pathFile = "src/main"+ path + "/" + Integer.toString(messageID_temp) +".txt";
-                //System.out.println(pathFile + "+++");
             }
                 Collections.sort(list);
+            //search in the sorted List for a free ID
             for(int j = 0; j<list.size();j++)
             {
                 if(list.get(j) == (j+1))
                     messageID_temp++;
             }
             pathFile = "src/main"+ path + "/" + Integer.toString(messageID_temp) +".txt";
-            System.out.println(list);
+            //System.out.println(list);
+            System.out.println("\nThis is the given MessageID: " + messageID_temp);
 
         }
-
+        //write the message in the File
         try(BufferedWriter writer = new BufferedWriter(new FileWriter(pathFile))) {
             writer.write(message);
         }
@@ -80,26 +75,42 @@ public class EndpointHandler {
 
         StringBuilder allMsg = new StringBuilder();
 
-        if(path.length()>9){
+        //if the ID is given in the Path
+        //then just save the correct Message into allMsg
+        if(path.length()>10){
             String[] splitting = path.split("/");
             String messageID;
             if(splitting.length>2){
                 messageID = splitting[2];
-                allMsg.append("MessageID: "+ messageID + " \r\n");
+                //appending the message ID
+                //allMsg.append("MessageID: "+ messageID + " \r\n");
                 String pathName = "src/main" + path + ".txt" ;
 
-                File myObj = new File(pathName);
-                Scanner myReader = new Scanner(myObj);
 
-                while (myReader.hasNextLine()) {
-                    String data = myReader.nextLine();
-                    allMsg.append(data+ "\r\n\n");
+                File myObj = new File(pathName);
+                boolean exists = myObj.exists();
+                if(exists) {
+                    allMsg.append("MessageID: "+ messageID + " \r\n");
+                    Scanner myReader = new Scanner(myObj);
+
+
+                    //appending the content in the textfile
+                    while (myReader.hasNextLine()) {
+                        String data = myReader.nextLine();
+                        allMsg.append(data + "\r\n\n");
+                    }
+                    myReader.close();
+                    System.out.println("The message with the ID: " + messageID + " is sent to the Client");
+                }else {
+                    System.out.println("File doesn't exist!");
+                    allMsg.append("NOTFOUND");
                 }
-                myReader.close();
             }
+
 
         }else{
             String pathName = "src/main" + path;
+            //if Client wants to read all Messages
             //searching through all files in specified directory
             File dir = new File(pathName);
             String[] children = dir.list();
@@ -110,10 +121,11 @@ public class EndpointHandler {
 
                 for (int i = 0; i < children.length; i++) {
 
+                    //append all filenames
                     String filename = children[i];
                     allMsg.append(filename + "\r\n\n");
 
-                    //read every textfile
+                    //read every textfile and append it
                     filename = "src/main/messages/" + filename;
                     File myObj = new File(filename);
                     Scanner myReader = new Scanner(myObj);
@@ -124,7 +136,8 @@ public class EndpointHandler {
                     }
                     myReader.close();
 
-                    }
+                }
+                System.out.println("All messages is sent to the Client");
             }
         }
         return allMsg.toString();
@@ -136,6 +149,47 @@ public class EndpointHandler {
                 + "Content-Type: text/html\r\n"
                 + "Accept-Ranges: bytes \r\n"
                 + "Content-Lenght: 0 \r\n\r\n";
+        return httpResponse;
+    }
+    public String responseErrorGET(){
+        String httpResponse = "HTTP/1.1 404 Not Found\r\n"
+                + "Content-Type: text/html\r\n"
+                + "Accept-Ranges: bytes \r\n"
+                + "Content-Lenght: 0 \r\n\r\n" + "Wrong Directory! No Content found...";
+        return httpResponse;
+    }
+    public String responseErrorGET2(){
+        String httpResponse = "HTTP/1.1 404 Not Found\r\n"
+                + "Content-Type: text/html\r\n"
+                + "Accept-Ranges: bytes \r\n"
+                + "Content-Lenght: 0 \r\n\r\n" + "File not found or doesn't exists...";
+        return httpResponse;
+    }
+
+    public boolean deleteDEL(String path){
+        String pathName = "src/main/" + path +".txt";
+        File myObj = new File(pathName);
+        boolean exists = myObj.exists();
+        if(exists){
+            myObj.delete();
+                System.out.println("File: " + myObj.getName() + " has been deleted");
+                return true;
+        }else{
+            System.out.println("File could not be deleted");
+        } return false;
+    }
+    public String responseDELETE(){
+        String httpResponse = "HTTP/1.1 202 Accepted\r\n"
+                + "Content-Type: text/html\r\n"
+                + "Accept-Ranges: bytes \r\n"
+                + "Content-Lenght: 0 \r\n\r\n" + "The Message has been deleted...";
+        return httpResponse;
+    }
+    public String responseErrorDELETE(){
+        String httpResponse = "HTTP/1.1 404 Not Found\r\n"
+                + "Content-Type: text/html\r\n"
+                + "Accept-Ranges: bytes \r\n"
+                + "Content-Lenght: 0 \r\n\r\n" + "File not found or doesn't exists...";
         return httpResponse;
     }
 

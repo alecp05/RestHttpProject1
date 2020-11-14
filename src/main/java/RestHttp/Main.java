@@ -69,6 +69,7 @@ public class Main {
                 }
                 //payload being set
                 requestClient.setPayload(content.toString());
+                System.out.println("Message:");
                 System.out.println(requestClient.getPayload());
                 //payload sent to handlerPOST
                 EndpointHandler post = new EndpointHandler();
@@ -79,11 +80,30 @@ public class Main {
         }else if (usedMethod.equals("GET")) {
             EndpointHandler getAll = new EndpointHandler();
             String allmsg;
-            allmsg = getAll.printAllGET(requestClient.getPath());
+            if(requestClient.getPath().length()<9){
+                EndpointHandler get = new EndpointHandler();
+                client.getOutputStream().write(get.responseErrorGET().getBytes(StandardCharsets.UTF_8));
+            }else {
+                allmsg = getAll.printAllGET(requestClient.getPath());
+                if(allmsg.equals("NOTFOUND")){
+                    String httpResponse = getAll.responseErrorGET2();
+                    client.getOutputStream().write(httpResponse.getBytes(StandardCharsets.UTF_8));
+                }else {
 
-            //all msg printed
-            String httpResponse = getAll.responseGET() + allmsg;
-            client.getOutputStream().write(httpResponse.getBytes(StandardCharsets.UTF_8));
+                    //all msg printed
+                    String httpResponse = getAll.responseGET() + allmsg;
+                    client.getOutputStream().write(httpResponse.getBytes(StandardCharsets.UTF_8));
+                }
+            }
+        }else if(usedMethod.equals("DELETE")){
+            EndpointHandler delete = new EndpointHandler();
+            if(delete.deleteDEL(requestClient.getPath())){
+                String httpResponse = delete.responseDELETE() ;
+                client.getOutputStream().write(httpResponse.getBytes(StandardCharsets.UTF_8));
+            }else{
+                String httpResponse = delete.responseErrorDELETE();
+                client.getOutputStream().write(httpResponse.getBytes(StandardCharsets.UTF_8));
+            }
         }
         client.close();
     }
