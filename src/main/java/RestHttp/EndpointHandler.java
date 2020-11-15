@@ -209,7 +209,7 @@ public class EndpointHandler {
     }
 
     public boolean contentPUT(String path, String message){
-        String pathName = "src/main/" + path +".txt";
+        String pathName = "src/main" + path +".txt";
         File myObj = new File(pathName);
         boolean exists = myObj.exists();
 
